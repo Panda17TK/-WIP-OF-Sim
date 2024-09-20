@@ -43,4 +43,21 @@ class Link:
 
         # 宛先ノードを決定し、パケットを送信
         dest_node = self.node1 if src_node == self.node2 else self.node2
-        dest_node.receive_packet(packet, self)
+
+        # リンクのポート番号を決定する
+        in_port = self.get_port_number(dest_node)
+
+        dest_node.receive_packet(packet, in_port)
+
+    def get_port_number(self, node):
+        """
+        ノードに接続されているこのリンクのポート番号を取得します。
+
+        Args:
+            node (Node): ノード（送信先または受信元のノード）。
+
+        Returns:
+            int: ノード内のリンクのインデックスとしてのポート番号。
+        """
+        # node.links の中でこのリンクが何番目にあるか（ポート番号）を返す
+        return node.links.index(self)

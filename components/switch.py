@@ -15,6 +15,16 @@ class Switch(Node):
         """
         super().__init__(name)
         self.flow_table = {}  # フローテーブル（マッチ条件 -> アクションの辞書）
+        self.controller = None  # コントローラの参照を保持
+
+    def set_controller(self, controller):
+        """
+        スイッチにコントローラを設定します。
+
+        Args:
+            controller (BaseController): コントローラのインスタンス。
+        """
+        self.controller = controller
 
     def receive_packet(self, packet, in_port):
         """
@@ -48,13 +58,17 @@ class Switch(Node):
 
     def send_packet_to_controller(self, packet, in_port):
         """
-        フローテーブルに一致するエントリが見つからない場合、パケットをコントローラに送信します。
+        コントローラにPacket-Inメッセージを送信します。
 
         Args:
             packet (Packet): コントローラに送信するパケット。
             in_port (int): パケットを受信したポート番号。
         """
-        print(f"{self.name}: コントローラにパケットを送信: {packet.get_info()}")
+        if self.controller:
+            # コントローラにパケットを送信
+            self.controller.handle_packet_in(packet, self, in_port)
+        else:
+            print(f"{self.name}: コントローラが設定されていません。")
 
     def send_packet(self, packet, out_port):
         """
