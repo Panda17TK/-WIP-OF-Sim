@@ -40,3 +40,15 @@ class Emulator:
 	def handle_packet_arrival(self, event):
 		# パケット到着イベントの処理（仮の処理）
 		print(f"Packet arrived at {event.node.name} at time {event.time}")
+
+	def get_node_by_name(self, name):
+		"""
+		ノードの名前を指定して取得します。
+
+		Args:
+			name (str): ノードの名前。
+
+		Returns:
+			Node: 指定された名前のノード、存在しない場合は None を返す。
+		"""
+		return self.nodes.get(name, None)
