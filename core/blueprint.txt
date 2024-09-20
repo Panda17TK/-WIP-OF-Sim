@@ -42,3 +42,37 @@ run_simulation(self, duration):
 
 process_event(self, event):
 イベントの種類に応じて適切なハンドラを呼び出し、イベントを処理。
+
+2. event_queue.py
+クラス: EventQueue
+役割: シミュレーション中に発生するイベントを管理し、時系列順に処理するキュー。
+属性
+queue: イベントを格納するプライオリティキュー（ヒープ）。
+メソッド
+__init__(self):
+イベントキューの初期化。
+
+push(self, event):
+イベントをキューに追加。
+
+pop(self):
+最も早い時間のイベントをキューから取得し、削除。
+
+is_empty(self):
+キューが空かどうかを確認。
+
+3. packet.py
+クラス: Packet
+役割: シミュレーション内でやり取りされるパケットの構造を定義。
+属性
+src: パケットの送信元ノード。
+dst: パケットの宛先ノード。
+payload: パケットのデータ部分。
+protocol: パケットのプロトコル情報（例: TCP, UDP, ICMPなど）。
+
+メソッド
+__init__(self, src, dst, payload, protocol):
+パケットの初期化。送信元、宛先、ペイロード、プロトコルを設定。
+
+get_info(self):
+パケットの基本情報を返すメソッド（デバッグ用）。
