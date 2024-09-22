@@ -72,7 +72,7 @@ class TopologyBuilder:
         Returns:
             dict: トポロジのノードオブジェクトとリンク情報を持つ辞書。
         """
-        # ノードとリンクの情報を出力し、トポロジを構築
+        # ノードオブジェクトとリンク情報を持つ辞書を返す
         topology_info = {
             "nodes": self.nodes,  # ノードオブジェクトを返す
             "links": self.links
