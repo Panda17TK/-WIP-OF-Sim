@@ -1,3 +1,4 @@
+
 from core.emulator import Emulator
 from controller.custom_controller import CustomController
 from topology.example_topology import create_example_topology, create_mesh_topology, create_ring_topology
@@ -16,7 +17,7 @@ topology = create_mesh_topology()  # メッシュトポロジを使用
 
 # トポロジ内のノードをエミュレータに追加
 for node in topology['nodes']:
-    emulator.add_node(node)  # Node オブジェクトを追加
+    emulator.add_node(node)
 
 # コントローラをスイッチに追加
 for node in emulator.nodes:
@@ -41,6 +42,9 @@ emulator.run_simulation(duration=5)
 
 # 統計データを表示
 stats_collector.print_stats()
+
+# 統計データを CSV ファイルに保存（結果保存用フォルダにタイムスタンプ付きファイル名で）
+stats_collector.save_to_csv(folder_path="results", file_prefix="network_stats")
 
 # 統計データの収集を停止
 stats_collector.stop()

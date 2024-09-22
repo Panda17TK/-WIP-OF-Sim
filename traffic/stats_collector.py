@@ -1,5 +1,7 @@
 import time
 import csv
+import os
+from datetime import datetime
 
 class StatsCollector:
     """
@@ -69,14 +71,24 @@ class StatsCollector:
         for node_name, stats in self.data.items():
             print(f"ノード {node_name} の統計データ: {stats}")
 
-
-    def save_to_csv(self, file_path="stats.csv"):
+    def save_to_csv(self, folder_path="results", file_prefix="network_stats"):
         """
-        収集された統計データを CSV ファイルに保存します。
+        収集された統計データを指定されたフォルダに CSV ファイルとして保存します。
+        フォルダが存在しない場合は作成し、ファイル名にタイムスタンプを付けて保存します。
 
         Args:
-            file_path (str): 保存する CSV ファイルのパス（デフォルト: stats.csv）。
+            folder_path (str): 保存するフォルダのパス（デフォルト: results）。
+            file_prefix (str): 保存するファイル名の接頭辞（デフォルト: network_stats）。
         """
+        # 結果保存用のフォルダが存在しない場合は作成
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+            print(f"結果保存用フォルダを作成しました: {folder_path}")
+
+        # タイムスタンプ付きのファイル名を生成
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        file_path = os.path.join(folder_path, f"{file_prefix}_{timestamp}.csv")
+
         try:
             with open(file_path, mode='w', newline='', encoding='utf-8') as file:
                 writer = csv.writer(file)
@@ -88,3 +100,21 @@ class StatsCollector:
             print(f"統計データを {file_path} に保存しました。")
         except Exception as e:
             print(f"統計データの保存に失敗しました: {e}")
+
+    def update_stats(self):
+        """
+        ノードやリンクの統計データを定期的に更新します。
+        """
+        while self.running:
+            for node in self.emulator.nodes:
+                # ノードがオブジェクトであり、送信/受信メソッドを持っていることを確認
+                if isinstance(node, object) and hasattr(node, 'get_packets_sent'):
+                    # デバッグメッセージ: 統計データを更新するノードの名前を表示
+                    print(f"ノード {node.name} の統計データを更新します。")
+
+                    # ノードの送信・受信パケット数とバイト数を収集（仮の例）
+                    self.data[node.name]['packets_sent'] += node.get_packets_sent()
+                    self.data[node.name]['packets_received'] += node.get_packets_received()
+                    self.data[node.name]['bytes_sent'] += node.get_bytes_sent()
+                    self.data[node.name]['bytes_received'] += node.get_bytes_received()
+            time.sleep(1)  # 1秒ごとに統計情報を更新
