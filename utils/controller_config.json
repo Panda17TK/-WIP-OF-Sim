@@ -1,0 +1,18 @@
+{
+    "controllers": [
+        {
+            "name": "Controller1",
+            "ip_address": "127.0.0.1",
+            "port": 6633,
+            "algorithm": "shortest_path",
+            "rules": [
+                {
+                    "src_ip": "10.0.0.1",
+                    "dst_ip": "10.0.0.2",
+                    "action": "forward",
+                    "out_port": 1
+                }
+            ]
+        }
+    ]
+}
