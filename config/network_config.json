@@ -1,0 +1,47 @@
+{
+    "nodes": [
+        {
+            "name": "Host1",
+            "type": "host",
+            "ip_address": "10.0.0.1",
+            "mac_address": "00:00:00:00:00:01"
+        },
+        {
+            "name": "Switch1",
+            "type": "switch"
+        },
+        {
+            "name": "Host2",
+            "type": "host",
+            "ip_address": "10.0.0.2",
+            "mac_address": "00:00:00:00:00:02"
+        },
+        {
+            "name": "Switch2",
+            "type": "switch"
+        }
+    ],
+    "links": [
+        {
+            "node1": "Host1",
+            "node2": "Switch1",
+            "bandwidth": 100,
+            "delay": 10,
+            "packet_loss_rate": 0.0
+        },
+        {
+            "node1": "Switch1",
+            "node2": "Switch2",
+            "bandwidth": 100,
+            "delay": 5,
+            "packet_loss_rate": 0.0
+        },
+        {
+            "node1": "Switch2",
+            "node2": "Host2",
+            "bandwidth": 100,
+            "delay": 10,
+            "packet_loss_rate": 0.0
+        }
+    ]
+}

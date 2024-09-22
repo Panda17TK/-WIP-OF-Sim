@@ -1,8 +1,9 @@
 from core.emulator import Emulator
 from controller.custom_controller import CustomController
-from utils.utility_functions import load_config, build_network_from_config, initialize_controllers, save_results_to_csv
+from topology.example_topology import create_mesh_topology
 from traffic.flow_manager import FlowManager
 from traffic.stats_collector import StatsCollector
+from components.switch import Switch
 from monitoring.monitor import SimulationMonitor
 from monitoring.logger import EventLogger
 from monitoring.visualizer import NetworkVisualizer
@@ -11,36 +12,32 @@ from monitoring.visualizer import NetworkVisualizer
 emulator = Emulator()
 controller = CustomController()
 
-# 設定ファイルを読み込む
-network_config = load_config('config/network_config.json')
-controller_config = load_config('config/controller_config.json')
+# サンプルトポロジを作成
+topology = create_mesh_topology()
 
-# ネットワークを設定ファイルに基づいて構築
-build_network_from_config(emulator, network_config)
+# トポロジ内のノードをエミュレータに追加
+for node in topology['nodes']:
+    emulator.add_node(node)
 
-# デバッグ用にエミュレータ内のノードを表示
-print("エミュレータ内のノード:")
-for name, node in emulator.nodes.items():  # 修正: items() メソッドを使用してキーと値を取り出す
-    if isinstance(node, str):
-        print(f"エラー: ノードが文字列として格納されています - {name}: {node}")
-    else:
-        print(f"ノード名: {name}, ノードタイプ: {type(node)}")
-
-# コントローラを設定ファイルに基づいて初期化し、スイッチに追加
-initialize_controllers(emulator, controller_config)
+# コントローラをスイッチに追加
+for node in emulator.nodes:
+    if isinstance(node, Switch):
+        controller.add_switch(node)
 
 # シミュレーションモニタリングを初期化
-simulation_monitor = SimulationMonitor(emulator, interval=2)
-logger = EventLogger()
-visualizer = NetworkVisualizer(network=network_config)
-
-# 統計データを収集する StatsCollector を初期化
-stats_collector = StatsCollector(emulator)
-stats_collector.start()
+simulation_monitor = SimulationMonitor(emulator, interval=2)  # シミュレーションモニタリングを2秒間隔で設定
+logger = EventLogger()  # イベントロガーを初期化
+visualizer = NetworkVisualizer(network=topology)  # ネットワークビジュアライザを初期化
 
 # トラフィックフローを管理する FlowManager を初期化
 flow_manager = FlowManager()
-host1 = emulator.get_node_by_name("Host1")  # 修正: emulator.get_node_by_name を使用してノードを取得
+
+# 統計データを収集する StatsCollector を初期化
+stats_collector = StatsCollector(emulator)
+stats_collector.start()  # 統計データの収集を開始
+
+# トラフィックフローを追加（Host1 -> Host2）
+host1 = emulator.get_node_by_name("Host1")
 host2_ip = "10.0.0.2"
 if host1:
     flow1 = flow_manager.add_flow(host1, host2_ip, interval=1.0, payload="Hello from Host1")
@@ -55,7 +52,7 @@ emulator.run_simulation(duration=5)
 
 # シミュレーションモニタリングを停止
 simulation_monitor.stop()
-monitor_thread.join()
+monitor_thread.join()  # モニタリングスレッドの終了を待つ
 
 # 統計データを表示
 stats_collector.print_stats()

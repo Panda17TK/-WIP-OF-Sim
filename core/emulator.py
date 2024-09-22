@@ -51,4 +51,9 @@ class Emulator:
 		Returns:
 			Node: 指定された名前のノード、存在しない場合は None を返す。
 		"""
-		return self.nodes.get(name, None)
+		node = self.nodes.get(name, None)
+		if node is None:
+			print(f"デバッグ: ノード {name} がエミュレータに存在しません。")
+		elif isinstance(node, str):
+			print(f"デバッグ: ノード {name} は文字列として格納されています: {node}")
+		return node

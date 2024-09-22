@@ -14,6 +14,7 @@ stats_collector.py:
 ノードやリンクのパフォーマンスデータを収集し、各種統計情報（パケット数、バイト数、遅延、損失など）を記録。
 シミュレーション中のリアルタイムな統計データを収集し、後で分析できる形式で保存。
 
+
 2. 各ファイルの詳細設計
 2.1 traffic_generator.py の設計
 クラス: TrafficGenerator
@@ -26,6 +27,5 @@ FlowManager は、複数のトラフィックフローを管理し、動的に�
 2.3 stats_collector.py の設計
 クラス: StatsCollector
 StatsCollector は、各ノードやリンクのパフォーマンスデータを収集し、リアルタイムの統計情報を取得・記録する機能を提供します。
-
 
 

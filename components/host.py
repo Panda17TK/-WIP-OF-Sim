@@ -24,16 +24,23 @@ class Host(Node):
         self.sent_bytes = 0
         self.received_bytes = 0
 
-    def generate_packet(self, destination, payload="Test Packet"):
+    def generate_packet(self, destination_ip, payload):
         """
-        パケットを生成し、指定された宛先に送信します。
+        新しいパケットを生成し、送信します。
 
         Args:
-            destination (str): 宛先のIPアドレス。
-            payload (str): パケットのペイロードデータ。
+            destination_ip (str): 宛先の IP アドレス。
+            payload (str): パケットのペイロード。
         """
-        packet = Packet(src=self.ip_address, dst=destination, payload=payload)
-        # 送信ポートは仮に0とする
+        packet = Packet(
+            src_ip=self.ip_address,
+            dst_ip=destination_ip,
+            src_mac=self.mac_address,
+            dst_mac="ff:ff:ff:ff:ff:ff",  # ブロードキャスト MAC アドレス（仮）
+            protocol="TCP",
+            payload=payload
+        )
+        # 送信ポートはゼロで仮置き
         self.send_packet(packet, 0)
 
     def send_packet(self, packet, port):

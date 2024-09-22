@@ -5,6 +5,7 @@ from datetime import datetime
 from components.host import Host
 from components.switch import Switch
 from components.link import Link
+from components.node import Node
 from controller.custom_controller import CustomController
 
 def load_config(file_path):
@@ -42,9 +43,12 @@ def get_node_by_name(nodes, name):
     Returns:
         Node: 名前に一致するノードオブジェクト。見つからない場合は None。
     """
-    for node in nodes:
-        if node.name == name:
+    for node in nodes.items():
+        if not isinstance(node[1], Node):
+            print(f"Error: ノードリストに不正な要素 '{node}' が含まれています。Node オブジェクトである必要があります。")
+        elif node[0] == name:
             return node
+    print(f"ノード '{name}' は見つかりませんでした。")
     return None
 
 def build_network_from_config(emulator, config):
@@ -58,8 +62,6 @@ def build_network_from_config(emulator, config):
     Returns:
         None
     """
-    nodes = []
-
     # ノードの生成
     for node_config in config['nodes']:
         if node_config['type'] == 'host':
@@ -73,16 +75,22 @@ def build_network_from_config(emulator, config):
         else:
             raise ValueError(f"未知のノードタイプ: {node_config['type']}")
 
-        emulator.add_node(node)
-        nodes.append(node)
+        emulator.add_node(node)  # ノードをエミュレータに追加
+
+    # デバッグ: 追加されたノードを表示
+    print("エミュレータに追加されたノード:")
+    for node in emulator.nodes.values():  # 修正: values() メソッドを使用してノードオブジェクトを取得
+        print(f"ノード名: {node.name}, タイプ: {type(node)}")
 
     # リンクの生成
     for link_config in config['links']:
-        node1 = get_node_by_name(nodes, link_config['node1'])
-        node2 = get_node_by_name(nodes, link_config['node2'])
+        # get_node_by_name を使って Node オブジェクトを取得
+        node1 = emulator.get_node_by_name(link_config['node1'])
+        node2 = emulator.get_node_by_name(link_config['node2'])
         if node1 is None or node2 is None:
             raise ValueError(f"リンクのノードが見つかりません: {link_config['node1']}, {link_config['node2']}")
 
+        # リンクの作成
         link = Link(
             node1=node1,
             node2=node2,
@@ -90,6 +98,8 @@ def build_network_from_config(emulator, config):
             delay=link_config.get('delay', 10),
             packet_loss_rate=link_config.get('packet_loss_rate', 0.0)
         )
+
+        # ノードにリンクを追加
         node1.add_link(link)
         node2.add_link(link)
 
@@ -113,15 +123,20 @@ def initialize_controllers(emulator, config):
 
         # ルールを各スイッチに設定
         for rule in controller_data['rules']:
-            switch = get_node_by_name(emulator.nodes, rule.get('switch_name'))
-            if switch:
-                switch.install_flow(
-                    (rule['src_ip'], rule['dst_ip']),
-                    {'out_port': rule['out_port']}
-                )
+            switch_name = rule.get('switch_name')
+            switch = emulator.get_node_by_name(switch_name)  # 修正: get_node_by_name() を使用
+
+            if switch is None:
+                raise ValueError(f"スイッチ {switch_name} が見つかりません")
+
+            # フローエントリを設定
+            switch.install_flow(
+                (rule['src_ip'], rule['dst_ip']),
+                {'out_port': rule['out_port']}
+            )
 
         # コントローラを各スイッチに設定
-        for node in emulator.nodes:
+        for node in emulator.nodes.values():  # 修正: values() を使用して Node オブジェクトを取得
             if isinstance(node, Switch):
                 controller.add_switch(node)
 
@@ -166,3 +181,46 @@ def save_results_to_csv(stats, folder_path, file_prefix):
 
     print(f"結果をファイルに保存しました: {file_path}")
     return file_path
+
+
+def initialize_controllers(emulator, config):
+    """
+    controller_config.json の内容に基づいてコントローラを初期化し、スイッチに設定します。
+
+    Args:
+        emulator (Emulator): エミュレータインスタンス。
+        config (dict): controller_config.json から読み込んだ設定データ。
+
+    Returns:
+        list: 作成されたコントローラのリスト。
+    """
+    controllers = []
+
+    for controller_data in config['controllers']:
+        controller = CustomController()
+        controller.set_ip(controller_data['ip_address'])
+        controller.set_port(controller_data['port'])
+
+        # ルールを各スイッチに設定
+        for rule in controller_data['rules']:
+            switch_name = rule.get('switch_name')
+            switch = get_node_by_name(emulator.nodes, switch_name)[1]
+
+            if switch is None:
+                print(emulator.nodes)
+                raise ValueError(f"スイッチ {switch_name} が見つかりません")
+
+            # フローエントリを設定
+            switch.install_flow(
+                (rule['src_ip'], rule['dst_ip']),
+                {'out_port': rule['out_port']}
+            )
+
+        # コントローラを各スイッチに設定
+        for node in emulator.nodes:
+            if isinstance(node, Switch):
+                controller.add_switch(node)
+
+        controllers.append(controller)
+
+    return controllers
