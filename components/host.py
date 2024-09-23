@@ -1,5 +1,7 @@
 from components.node import Node
 from core.packet import Packet
+import threading
+import time
 
 class Host(Node):
     """
@@ -23,6 +25,7 @@ class Host(Node):
         self.received_packets = 0
         self.sent_bytes = 0
         self.received_bytes = 0
+        self.packet_sending_thread = None  # パケット送信スレッド
 
     def generate_packet(self, destination_ip, payload):
         """
@@ -50,8 +53,6 @@ class Host(Node):
         Args:
             packet (Packet): 送信するパケット。
             port (int): パケットを送信するポート番号。
-
-        このメソッドは、ホストがパケットを送信する際に送信パケット数と送信バイト数を更新します。
         """
         # 送信パケット数と送信バイト数を更新
         self.sent_packets += 1
@@ -68,54 +69,68 @@ class Host(Node):
         Args:
             packet (Packet): 受信したパケット。
             port (int): パケットを受信したポート番号。
-
-        このメソッドは、ホストがパケットを受信する際に受信パケット数と受信バイト数を更新します。
         """
         # 受信パケット数と受信バイト数を更新
         self.received_packets += 1
         self.received_bytes += len(packet.payload)
         print(f"{self.name} がパケットを受信しました: {packet.payload}")
 
+    def start_sending_packets(self, dst_ip, payload, interval=1.0, duration=10):
+        """
+        パケット送信を一定間隔で繰り返すスレッドを開始します。
+
+        Args:
+            dst_ip (str): 送信先の IP アドレス。
+            payload (str): パケットのペイロードデータ。
+            interval (float): パケットを送信する間隔（秒）。
+            duration (float): パケット送信を行う合計時間（秒）。
+        """
+        def send_packets():
+            end_time = time.time() + duration
+            while time.time() < end_time:
+                self.generate_packet(dst_ip, payload)
+                time.sleep(interval)
+
+        # パケット送信スレッドを開始
+        self.packet_sending_thread = threading.Thread(target=send_packets)
+        self.packet_sending_thread.start()
+
+    def stop_sending_packets(self):
+        """
+        パケット送信スレッドを停止します。
+        """
+        if self.packet_sending_thread and self.packet_sending_thread.is_alive():
+            self.packet_sending_thread.join()  # スレッドの終了を待機
+
+    # 統計情報取得用のメソッド
     def get_packets_sent(self):
         """
         送信パケット数を返します。
-
         Returns:
             int: ホストが送信したパケットの総数。
-
-        このメソッドは、シミュレーション中にホストが送信した全てのパケット数を取得するために使用されます。
         """
         return self.sent_packets
 
     def get_packets_received(self):
         """
         受信パケット数を返します。
-
         Returns:
             int: ホストが受信したパケットの総数。
-
-        このメソッドは、シミュレーション中にホストが受信した全てのパケット数を取得するために使用されます。
         """
         return self.received_packets
 
     def get_bytes_sent(self):
         """
         送信バイト数を返します。
-
         Returns:
             int: ホストが送信したデータの総バイト数。
-
-        このメソッドは、シミュレーション中にホストが送信したデータの総バイト数を取得するために使用されます。
         """
         return self.sent_bytes
 
     def get_bytes_received(self):
         """
         受信バイト数を返します。
-
         Returns:
             int: ホストが受信したデータの総バイト数。
-
-        このメソッドは、シミュレーション中にホストが受信したデータの総バイト数を取得するために使用されます。
         """
         return self.received_bytes

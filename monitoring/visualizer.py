@@ -24,21 +24,23 @@ class NetworkVisualizer:
         """
         # ノードをグラフに追加
         for node in self.network['nodes']:
-            # Node オブジェクトの場合は node.name を追加
-            if hasattr(node, 'name'):
-                self.graph.add_node(node.name)
+            # nodeが辞書型の場合は name を追加
+            if type(node) == dict:
+                self.graph.add_node(node["name"])
             else:
                 # 文字列の場合はそのまま追加
                 self.graph.add_node(node)
 
         # リンクをグラフに追加
+        print("network['links']", self.network['links'])
         for link in self.network['links']:
+            print("link", link)
             # Link オブジェクトの場合は、接続しているノードの名前を取得
             if hasattr(link, 'node1') and hasattr(link, 'node2'):
                 self.graph.add_edge(link.node1.name, link.node2.name)
             else:
                 # ノード名のタプルの場合
-                self.graph.add_edge(link[0], link[1])
+                self.graph.add_edge(link["node1"], link["node2"])
 
     def visualize_network(self):
         """
