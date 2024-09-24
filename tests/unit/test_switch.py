@@ -18,14 +18,9 @@ class TestSwitch(unittest.TestCase):
         self.assertEqual(self.switch.flow_table[("10.0.0.1", "10.0.0.2")], {"out_port": 1})
 
     def test_receive_packet_with_no_flow_entry(self):
-        packet = Packet(
-            src="10.0.0.1",
-            dst="10.0.0.2",
-            payload="Hello, Switch!",
-            protocol="TCP"
-        )
-        with self.assertLogs() as log:
-            self.switch.receive_packet(packet, 0)
+        with self.assertLogs(level='INFO') as log:
+            packet = Packet(src="10.0.0.1", dst="10.0.0.2", payload="Hello, Switch!", protocol="TCP")
+            self.switch.receive_packet(packet, 1)
             self.assertIn("パケットに対するフローエントリが存在しません", log.output[0])
 
 if __name__ == '__main__':

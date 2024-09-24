@@ -29,6 +29,15 @@ class Link:
         self.currently_processing = 0  # 現在処理中のパケット数
         self.processing_limit = bandwidth // 10  # 処理できるパケット数を帯域幅に応じて設定
 
+        # リンクをノードに追加
+        self.node1.add_link(self)
+        self.node2.add_link(self)
+
+        # 確認用のデバッグ出力
+        print(f"Link added between {self.node1.name} and {self.node2.name}")
+        print(f"{self.node1.name} links: {[link for link in self.node1.links]}")
+        print(f"{self.node2.name} links: {[link for link in self.node2.links]}")
+
     def transfer_packet(self, packet, src_node):
         """
         ソースノードから宛先ノードへパケットを転送します。

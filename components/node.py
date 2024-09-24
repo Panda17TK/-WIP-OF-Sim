@@ -29,7 +29,11 @@ class Node:
         Args:
             link (Link): ノードに追加するリンク。
         """
-        self.links.append(link)
+        if link not in self.links:
+            self.links.append(link)
+            print(f"リンクが {self.name} に追加されました: {link}")  # デバッグ出力
+        else:
+            print(f"リンクは既に {self.name} に存在しています: {link}")
 
     def receive_packet(self, packet, in_port=None):
         """

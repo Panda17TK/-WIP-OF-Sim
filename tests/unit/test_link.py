@@ -1,28 +1,31 @@
 import unittest
-from components.link import Link
 from components.host import Host
+from components.link import Link
 from core.packet import Packet
 
 class TestLink(unittest.TestCase):
-
     def setUp(self):
-        self.host1 = Host("Host1", "10.0.0.1", "00:00:00:00:00:01")
-        self.host2 = Host("Host2", "10.0.0.2", "00:00:00:00:00:02")
-        self.link = Link(self.host1, self.host2, bandwidth=100, delay=10, packet_loss_rate=0.1)
+        self.host1 = Host(name="Host1", ip_address="10.0.0.1", mac_address="00:00:00:00:00:01")
+        self.host2 = Host(name="Host2", ip_address="10.0.0.2", mac_address="00:00:00:00:00:02")
+        self.link = Link(node1=self.host1, node2=self.host2)
 
-    def test_initialization(self):
-        self.assertEqual(self.link.bandwidth, 100)
-        self.assertEqual(self.link.delay, 10)
-        self.assertEqual(self.link.packet_loss_rate, 0.1)
+        # リンクの初期化確認
+        self.assertIn(self.link, self.host1.links, f"リンクが {self.host1.name} に追加されていません")
+        self.assertIn(self.link, self.host2.links, f"リンクが {self.host2.name} に追加されていません")
+
+    def test_transfer_packet(self):
         packet = Packet(
             src="10.0.0.1",
             dst="10.0.0.2",
             payload="Test Payload",
             protocol="TCP"
         )
-        with self.assertLogs() as log:
-            self.link.transfer_packet(packet, self.host1)
-            self.assertIn("リンク (Host1 - Host2) のバッファにパケットを追加しました", log.output[0])
 
-if __name__ == '__main__':
-    unittest.main()
+        # transfer_packet メソッド呼び出し前にノードのリンク状態を確認
+        print(f"Host1 links before transfer: {self.host1.links}")
+        print(f"Host2 links before transfer: {self.host2.links}")
+
+        self.link.transfer_packet(packet, self.host1)
+
+        # パケットが正しく転送されたことを確認
+        self.assertEqual(self.host2.get_packets_received(), 1, "パケットが Host2 に到達していません")

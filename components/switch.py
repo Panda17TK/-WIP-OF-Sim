@@ -1,5 +1,6 @@
 from components.node import Node
 from queue import Queue
+import logging
 
 class Switch(Node):
     """
@@ -28,6 +29,8 @@ class Switch(Node):
         self.sent_bytes = 0  # 送信したバイト数
         self.received_bytes = 0  # 受信したバイト数
 
+        self.logger = logging.getLogger(__name__)  # ロガーを設定
+
     def set_controller(self, controller):
         """
         スイッチにコントローラを設定します。
@@ -48,7 +51,12 @@ class Switch(Node):
         # 受信パケット数と受信バイト数を更新
         self.received_packets += 1
         self.received_bytes += len(packet.payload)
-        print(f"{self.name} がパケットを受信しました: {packet.payload}")
+        self.logger.info(f"{self.name} がパケットを受信しました: {packet.payload}")
+
+        key = (packet.src, packet.dst)
+        if key not in self.flow_table:
+            self.logger.info(f"{self.name}: パケットに対するフローエントリが存在しません: {packet.get_info()}")
+            self.send_packet_to_controller(packet, in_port)
 
         # バッファに空きがあるか確認
         if self.buffer.full():

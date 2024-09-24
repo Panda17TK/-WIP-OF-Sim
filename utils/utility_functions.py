@@ -43,12 +43,9 @@ def get_node_by_name(nodes, name):
     Returns:
         Node: 名前に一致するノードオブジェクト。見つからない場合は None。
     """
-    for node in nodes.items():
-        if not isinstance(node[1], Node):
-            print(f"Error: ノードリストに不正な要素 '{node}' が含まれています。Node オブジェクトである必要があります。")
-        elif node[0] == name:
+    for node in nodes.values():  # ノードの辞書からオブジェクトを直接取得
+        if node.name == name:
             return node
-    print(f"ノード '{name}' は見つかりませんでした。")
     return None
 
 def build_network_from_config(emulator, config):
@@ -74,7 +71,6 @@ def build_network_from_config(emulator, config):
             node = Switch(name=node_config['name'])
         else:
             raise ValueError(f"未知のノードタイプ: {node_config['type']}")
-
         emulator.add_node(node)  # ノードをエミュレータに追加
 
     # デバッグ: 追加されたノードを表示
@@ -85,8 +81,8 @@ def build_network_from_config(emulator, config):
     # リンクの生成
     for link_config in config['links']:
         # get_node_by_name を使って Node オブジェクトを取得
-        node1 = emulator.get_node_by_name(link_config['node1'])
-        node2 = emulator.get_node_by_name(link_config['node2'])
+        node1 = emulator.get_node_by_name(link_config['node1'])[1]
+        node2 = emulator.get_node_by_name(link_config['node2'])[1]
         if node1 is None or node2 is None:
             raise ValueError(f"リンクのノードが見つかりません: {link_config['node1']}, {link_config['node2']}")
 
@@ -98,7 +94,7 @@ def build_network_from_config(emulator, config):
             delay=link_config.get('delay', 10),
             packet_loss_rate=link_config.get('packet_loss_rate', 0.0)
         )
-
+        emulator.add_link(link)  # エミュレータにリンクを追加
         # ノードにリンクを追加
         node1.add_link(link)
         node2.add_link(link)
