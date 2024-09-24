@@ -25,8 +25,8 @@
 
 ```bash
 # プロジェクトをクローン
-git clone https://github.com/username/network-emulator.git
-cd network-emulator
+git clone https://github.com/Panda17TK/OF-SIM.git
+cd OF-SIM
 
 # 仮想環境の作成
 python -m venv venv
@@ -111,7 +111,7 @@ emulator.run_simulation(10)  # 10秒間シミュレーションを実行
 
 ### 3. シミュレーションの実行
 
-`run_simulation.py` などのスクリプトを使用して、シミュレーションを実行できます。以下は基本的な手順です。
+`run_simulation.py` などのスクリプトを使用して、シミュレーションを実行できます。
 
 ```bash
 python run_simulation.py
@@ -121,7 +121,7 @@ python run_simulation.py
 
 ### 4. 結果の保存と可視化
 
-シミュレーションの結果は `results` フォルダにCSVファイルとして保存されます。保存されたデータを分析し、可視化することも可能です。
+シミュレーションの結果は `results` フォルダにCSVファイルとして保存されます。保存されたデータを分析し、可視化出来るようになる予定です。
 
 ```bash
 # 結果を可視化するには

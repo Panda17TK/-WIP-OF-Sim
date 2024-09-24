@@ -67,7 +67,7 @@ class Link:
             time.sleep(self.delay / 1000.0)
 
             # 宛先ノードを決定し、パケットを送信
-            dest_node = self.node1 if packet.src_ip != self.node1.ip_address else self.node2
+            dest_node = self.node1 if packet.src != self.node1.ip_address else self.node2
             in_port = self.get_port_number(dest_node)
 
             # 宛先ノードにパケットを転送
@@ -86,4 +86,6 @@ class Link:
         Returns:
             int: ノード内のリンクのインデックスとしてのポート番号。
         """
+        print("node.links", node.links)
+        print("self", self)
         return node.links.index(self)

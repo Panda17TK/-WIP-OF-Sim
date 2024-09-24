@@ -14,15 +14,11 @@ class TestLink(unittest.TestCase):
         self.assertEqual(self.link.bandwidth, 100)
         self.assertEqual(self.link.delay, 10)
         self.assertEqual(self.link.packet_loss_rate, 0.1)
-
-    def test_transfer_packet(self):
         packet = Packet(
-            src_ip="10.0.0.1",
-            dst_ip="10.0.0.2",
-            src_mac="00:00:00:00:00:01",
-            dst_mac="00:00:00:00:00:02",
-            protocol="TCP",
-            payload="Test payload"
+            src="10.0.0.1",
+            dst="10.0.0.2",
+            payload="Test Payload",
+            protocol="TCP"
         )
         with self.assertLogs() as log:
             self.link.transfer_packet(packet, self.host1)

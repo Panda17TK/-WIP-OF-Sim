@@ -14,10 +14,8 @@ class TestHost(unittest.TestCase):
 
     def test_packet_generation(self):
         packet = Packet(
-            src_ip="10.0.0.1",
-            dst_ip="10.0.0.2",
-            src_mac="00:00:00:00:00:01",
-            dst_mac="00:00:00:00:00:02",
+            src="10.0.0.1",
+            dst="10.0.0.2",
             protocol="TCP",
             payload="Test payload"
         )
@@ -27,12 +25,10 @@ class TestHost(unittest.TestCase):
 
     def test_receive_packet(self):
         packet = Packet(
-            src_ip="10.0.0.2",
-            dst_ip="10.0.0.1",
-            src_mac="00:00:00:00:00:02",
-            dst_mac="00:00:00:00:00:01",
-            protocol="TCP",
-            payload="Test payload"
+            src="10.0.0.1",
+            dst="10.0.0.2",
+            payload="Hello, World!",
+            protocol="TCP"
         )
         self.host.receive_packet(packet, 0)
         self.assertEqual(self.host.get_packets_received(), 1)

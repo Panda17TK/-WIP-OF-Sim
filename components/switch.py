@@ -72,7 +72,7 @@ class Switch(Node):
             self.currently_processing += 1
 
             # パケットの送信元と宛先に基づいてフローテーブルを確認
-            key = (packet.src_ip, packet.dst_ip)
+            key = (packet.src, packet.dst)
             if key in self.flow_table:
                 # フローテーブルに一致するエントリがある場合、アクションを取得
                 action = self.flow_table[key]

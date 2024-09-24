@@ -19,12 +19,10 @@ class TestSwitch(unittest.TestCase):
 
     def test_receive_packet_with_no_flow_entry(self):
         packet = Packet(
-            src_ip="10.0.0.1",
-            dst_ip="10.0.0.2",
-            src_mac="00:00:00:00:00:01",
-            dst_mac="00:00:00:00:00:02",
-            protocol="TCP",
-            payload="Test payload"
+            src="10.0.0.1",
+            dst="10.0.0.2",
+            payload="Hello, Switch!",
+            protocol="TCP"
         )
         with self.assertLogs() as log:
             self.switch.receive_packet(packet, 0)
