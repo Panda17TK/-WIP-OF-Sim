@@ -181,15 +181,3 @@ project_root/
 ├── test_runner.py       # テストを一括で実行するスクリプト
 └── README.md            # このファイル
 ```
-
-## 貢献
-
-バグ報告、機能リクエスト、プルリクエストを歓迎します。以下の手順で貢献できます。
-
-1. リポジトリをフォーク
-2. 新しいブランチを作成 (`git checkout -b feature/your-feature`)
-3. 変更をコミット (`git commit -am 'Add your feature'`)
-4. ブランチにプッシュ (`git push origin feature/your-feature`)
-5. プルリクエストを作成
-
----
